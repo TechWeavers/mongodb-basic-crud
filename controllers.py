@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, ValidationError
 import uuid
-from db import create_mongodb_connection, insert_item, update_item, delete_item
+from db import create_mongodb_connection, insert_item_db, update_item_db, delete_item_db
 
 class Item(BaseModel):
     id: Optional[str] = None
@@ -21,7 +21,7 @@ collection = db[collection_name]
 
 def create_item(item: Item) -> Item:
     item.id = str(uuid.uuid4())
-    insert_item(collection, item.dict())
+    insert_item_db(collection, item.model_dump())
     return item
 
 def get_all_items() -> List[Item]:
@@ -31,11 +31,11 @@ def get_all_items() -> List[Item]:
     return items
 
 def update_item(item_id: str, updated_item: Item) -> Optional[Item]:
-    result = update_item(collection, item_id, updated_item.dict())
+    result = update_item_db(collection, item_id, updated_item.model_dump())
     if result:
         return updated_item
     return None
 
 def delete_item(item_id: str) -> dict:
-    result = delete_item(collection, item_id)
+    result = delete_item_db(collection, item_id)
     return result
